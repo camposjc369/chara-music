@@ -65,6 +65,36 @@
       color: white;
     }
 
+    .musica {
+      background: #1c1c1c;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .numero {
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    .artista {
+      font-weight: bold;
+      font-size: 17px;
+    }
+
+    .titulo {
+      color: #ddd;
+      margin-top: 4px;
+    }
+
+    .busca {
+      display: inline-block;
+      margin-top: 8px;
+      color: #4da6ff;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
     .player {
       margin-top: 25px;
       background: #1c1c1c;
@@ -89,20 +119,6 @@
       text-align: center;
       color: #bbb;
       margin: 12px 0;
-    }
-
-    ol {
-      padding-left: 25px;
-    }
-
-    li {
-      margin-bottom: 12px;
-      line-height: 1.4;
-    }
-
-    a {
-      color: #4da6ff;
-      text-decoration: none;
     }
 
     .aviso {
@@ -130,7 +146,7 @@
 
   <textarea id="comando"
     placeholder="Exemplo:
-Monte uma sequência animada de 1 hora, misturando samba, pagode e músicas internacionais."></textarea>
+Monte uma sequência animada misturando samba, pagode e músicas internacionais."></textarea>
 
   <h3>🎵 Importar lista de músicas</h3>
 
@@ -139,16 +155,15 @@ Monte uma sequência animada de 1 hora, misturando samba, pagode e músicas inte
 
 Exemplo:
 Jorge Ben Jor - Taj Mahal
-Zeca Pagodinho - Deixa a Vida Me Levar
-Charlie Brown Jr. - Só os Loucos Sabem"></textarea>
+Zeca Pagodinho - Deixa a Vida Me Levar"></textarea>
 
-  <button class="principal" onclick="organizarLista()">
-    📋 Organizar lista
+  <button class="principal" onclick="interpretarLista()">
+    🧠 Interpretar lista
   </button>
 
   <h2>🎧 Minha sequência</h2>
 
-  <ol id="resultado"></ol>
+  <div id="resultado"></div>
 
   <div class="player">
 
@@ -157,7 +172,7 @@ Charlie Brown Jr. - Só os Loucos Sabem"></textarea>
     <div id="youtube-player"></div>
 
     <div class="status" id="status">
-      Nenhuma música carregada.
+      Player aguardando.
     </div>
 
     <div class="controles">
@@ -181,9 +196,7 @@ Charlie Brown Jr. - Só os Loucos Sabem"></textarea>
     </div>
 
     <div class="aviso">
-      🎵 O player utiliza o sistema oficial do YouTube.
-      O comportamento de anúncios e reprodução em segundo plano
-      é controlado pelo próprio YouTube e pelo navegador.
+      🎵 Player oficial do YouTube.
     </div>
 
   </div>
@@ -192,15 +205,174 @@ Charlie Brown Jr. - Só os Loucos Sabem"></textarea>
 
 <script>
 
-  let player;
-
   let fila = [];
 
   let indiceAtual = 0;
 
+  let player;
+
+
   /*
-    Estes IDs são apenas para testar o funcionamento
-    do player e da troca automática.
+    INTERPRETAÇÃO DA LISTA
+  */
+
+  function interpretarLista() {
+
+    const texto =
+      document.getElementById("listaMusicas").value;
+
+    const linhas =
+      texto
+        .split("\n")
+        .map(linha => linha.trim())
+        .filter(linha => linha !== "");
+
+
+    fila = [];
+
+
+    linhas.forEach(linha => {
+
+      let partes = linha.split(" - ");
+
+
+      let artista = "";
+      let titulo = "";
+
+
+      if (partes.length >= 2) {
+
+        artista = partes[0].trim();
+
+        titulo = partes.slice(1).join(" - ").trim();
+
+      } else {
+
+        titulo = linha;
+
+      }
+
+
+      fila.push({
+
+        artista: artista,
+
+        titulo: titulo,
+
+        textoOriginal: linha
+
+      });
+
+    });
+
+
+    mostrarFila();
+
+  }
+
+
+  /*
+    MOSTRA A LISTA INTERPRETADA
+  */
+
+  function mostrarFila() {
+
+    const resultado =
+      document.getElementById("resultado");
+
+    resultado.innerHTML = "";
+
+
+    if (fila.length === 0) {
+
+      resultado.innerHTML =
+        "<p>Nenhuma música encontrada.</p>";
+
+      return;
+
+    }
+
+
+    fila.forEach((musica, index) => {
+
+      const bloco =
+        document.createElement("div");
+
+      bloco.className = "musica";
+
+
+      const numero =
+        document.createElement("div");
+
+      numero.className = "numero";
+
+      numero.innerText =
+        "🎵 Música " + (index + 1);
+
+
+      const artista =
+        document.createElement("div");
+
+      artista.className = "artista";
+
+      artista.innerText =
+        musica.artista || "Artista não identificado";
+
+
+      const titulo =
+        document.createElement("div");
+
+      titulo.className = "titulo";
+
+      titulo.innerText =
+        musica.titulo;
+
+
+      const busca =
+        document.createElement("a");
+
+      busca.className = "busca";
+
+      busca.target = "_blank";
+
+      busca.innerText =
+        "🔎 Procurar esta música no YouTube";
+
+
+      const pesquisa =
+        musica.artista +
+        " " +
+        musica.titulo;
+
+
+      busca.href =
+        "https://www.youtube.com/results?search_query=" +
+        encodeURIComponent(pesquisa);
+
+
+      bloco.appendChild(numero);
+
+      bloco.appendChild(artista);
+
+      bloco.appendChild(titulo);
+
+      bloco.appendChild(busca);
+
+
+      resultado.appendChild(bloco);
+
+    });
+
+
+    document.getElementById("status").innerText =
+      fila.length +
+      " músicas interpretadas pelo Chará Music.";
+
+  }
+
+
+  /*
+    PLAYER — POR ENQUANTO CONTINUA COM VÍDEOS DE TESTE
   */
 
   const videosTeste = [
@@ -210,97 +382,56 @@ Charlie Brown Jr. - Só os Loucos Sabem"></textarea>
   ];
 
 
-  // Carrega a API oficial do YouTube
-  let tag = document.createElement("script");
+  let tag =
+    document.createElement("script");
 
-  tag.src = "https://www.youtube.com/iframe_api";
+  tag.src =
+    "https://www.youtube.com/iframe_api";
 
   document.head.appendChild(tag);
 
 
-  // Função chamada automaticamente pelo YouTube
   function onYouTubeIframeAPIReady() {
 
-    player = new YT.Player("youtube-player", {
+    player =
+      new YT.Player("youtube-player", {
 
-      height: "100%",
+        height: "100%",
 
-      width: "100%",
+        width: "100%",
 
-      videoId: videosTeste[0],
+        videoId: videosTeste[0],
 
-      playerVars: {
-        rel: 0
-      },
-
-      events: {
-
-        "onReady": function() {
-
-          document.getElementById("status").innerText =
-            "Player pronto. Clique em ▶️ Play.";
-
+        playerVars: {
+          rel: 0
         },
 
-        "onStateChange": mudouEstado
+        events: {
 
-      }
+          "onReady": function() {
 
-    });
+            document.getElementById("status").innerText =
+              "Lista interpretada. Player pronto.";
+
+          },
+
+          "onStateChange": mudouEstado
+
+        }
+
+      });
 
   }
 
 
-  // Detecta quando uma música terminou
   function mudouEstado(event) {
 
-    if (event.data === YT.PlayerState.ENDED) {
+    if (
+      event.data ===
+      YT.PlayerState.ENDED
+    ) {
 
       proxima();
-
-    }
-
-  }
-
-
-  function organizarLista() {
-
-    const texto =
-      document.getElementById("listaMusicas").value;
-
-    const linhas =
-      texto.split("\n")
-      .map(linha => linha.trim())
-      .filter(linha => linha !== "");
-
-    const resultado =
-      document.getElementById("resultado");
-
-    resultado.innerHTML = "";
-
-    fila = linhas;
-
-    indiceAtual = 0;
-
-    linhas.forEach((musica, index) => {
-
-      const li = document.createElement("li");
-
-      li.innerHTML =
-        musica +
-        ' — <a href="https://www.youtube.com/results?search_query=' +
-        encodeURIComponent(musica) +
-        '" target="_blank">🔎 Procurar no YouTube</a>';
-
-      resultado.appendChild(li);
-
-    });
-
-    if (linhas.length > 0) {
-
-      document.getElementById("status").innerText =
-        linhas.length +
-        " músicas adicionadas à sequência.";
 
     }
 
@@ -313,9 +444,6 @@ Charlie Brown Jr. - Só os Loucos Sabem"></textarea>
 
     player.playVideo();
 
-    document.getElementById("status").innerText =
-      "▶️ Reproduzindo.";
-
   }
 
 
@@ -324,9 +452,6 @@ Charlie Brown Jr. - Só os Loucos Sabem"></textarea>
     if (!player) return;
 
     player.pauseVideo();
-
-    document.getElementById("status").innerText =
-      "⏸️ Pausado.";
 
   }
 
@@ -343,10 +468,9 @@ Charlie Brown Jr. - Só os Loucos Sabem"></textarea>
 
     }
 
-    player.loadVideoById(videosTeste[indiceAtual]);
-
-    document.getElementById("status").innerText =
-      "▶️ Próxima música.";
+    player.loadVideoById(
+      videosTeste[indiceAtual]
+    );
 
   }
 
@@ -359,11 +483,14 @@ Charlie Brown Jr. - Só os Loucos Sabem"></textarea>
 
     if (indiceAtual < 0) {
 
-      indiceAtual = videosTeste.length - 1;
+      indiceAtual =
+        videosTeste.length - 1;
 
     }
 
-    player.loadVideoById(videosTeste[indiceAtual]);
+    player.loadVideoById(
+      videosTeste[indiceAtual]
+    );
 
   }
 
