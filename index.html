@@ -3,83 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chará Music</title>
+
+  <title>🎵 Chará Music</title>
 
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
       background: #111;
       color: white;
+      margin: 0;
+      padding: 20px;
     }
 
     .container {
       max-width: 700px;
       margin: auto;
-      padding: 20px;
     }
 
     h1 {
       text-align: center;
+      margin-bottom: 5px;
     }
 
-    .subtitulo {
+    .subtitle {
       text-align: center;
       color: #aaa;
       margin-bottom: 25px;
     }
 
-    .card {
-      background: #1c1c1c;
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 18px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-    }
-
     textarea {
       width: 100%;
+      box-sizing: border-box;
       min-height: 130px;
-      border: 1px solid #444;
-      border-radius: 12px;
+      margin-bottom: 15px;
       padding: 12px;
-      background: #292929;
-      color: white;
-      font-size: 16px;
+      border-radius: 10px;
+      border: none;
+      font-size: 15px;
       resize: vertical;
     }
 
     button {
-      width: 100%;
       border: none;
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 12px;
-      font-size: 16px;
-      font-weight: bold;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin: 5px;
+      font-size: 15px;
       cursor: pointer;
     }
 
-    .musica {
-      background: #292929;
-      border-radius: 12px;
-      padding: 14px;
+    .principal {
+      background: #ff0000;
+      color: white;
+      width: calc(100% - 10px);
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    .controle {
+      background: #333;
+      color: white;
+    }
+
+    .player {
+      margin-top: 25px;
+      background: #1c1c1c;
+      padding: 15px;
+      border-radius: 15px;
+    }
+
+    #youtube-player {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: black;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .controles {
+      text-align: center;
       margin-top: 10px;
     }
 
-    .musica a {
-      color: white;
+    .status {
+      text-align: center;
+      color: #bbb;
+      margin: 12px 0;
+    }
+
+    ol {
+      padding-left: 25px;
+    }
+
+    li {
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    a {
+      color: #4da6ff;
       text-decoration: none;
     }
 
-    .vazio {
-      color: #888;
-      text-align: center;
+    .aviso {
+      background: #292929;
+      padding: 12px;
+      border-radius: 10px;
+      color: #ccc;
+      font-size: 14px;
+      margin-top: 15px;
     }
   </style>
 </head>
@@ -90,49 +122,68 @@
 
   <h1>🎵 Chará Music</h1>
 
-  <div class="subtitulo">
+  <div class="subtitle">
     Seu organizador musical pessoal
   </div>
 
-  <div class="card">
+  <h3>🧠 Comando para o Chará</h3>
 
-    <label>🧠 Comando para o Chará</label>
+  <textarea id="comando"
+    placeholder="Exemplo:
+Monte uma sequência animada de 1 hora, misturando samba, pagode e músicas internacionais."></textarea>
 
-    <textarea id="comando"
-      placeholder="Exemplo: Monte uma sequência de 1 hora com samba e pagode, começando animada e terminando tranquila."></textarea>
+  <h3>🎵 Importar lista de músicas</h3>
 
-    <button onclick="interpretarComando()">
-      🧠 Interpretar comando
-    </button>
-
-  </div>
-
-  <div class="card">
-
-    <label>🎵 Importar lista de músicas</label>
-
-    <textarea id="lista"
-      placeholder="Cole aqui suas músicas.
+  <textarea id="listaMusicas"
+    placeholder="Uma música por linha.
 
 Exemplo:
 Jorge Ben Jor - Taj Mahal
 Zeca Pagodinho - Deixa a Vida Me Levar
 Charlie Brown Jr. - Só os Loucos Sabem"></textarea>
 
-    <button onclick="organizarLista()">
-      📋 Organizar lista
-    </button>
+  <button class="principal" onclick="organizarLista()">
+    📋 Organizar lista
+  </button>
 
-  </div>
+  <h2>🎧 Minha sequência</h2>
 
-  <div class="card">
+  <ol id="resultado"></ol>
 
-    <label>🎧 Minha sequência</label>
+  <div class="player">
 
-    <div id="resultado">
-      <div class="vazio">
-        Sua sequência aparecerá aqui.
-      </div>
+    <h2>▶️ Player</h2>
+
+    <div id="youtube-player"></div>
+
+    <div class="status" id="status">
+      Nenhuma música carregada.
+    </div>
+
+    <div class="controles">
+
+      <button class="controle" onclick="anterior()">
+        ⏮️ Anterior
+      </button>
+
+      <button class="controle" onclick="playAtual()">
+        ▶️ Play
+      </button>
+
+      <button class="controle" onclick="pausar()">
+        ⏸️ Pausar
+      </button>
+
+      <button class="controle" onclick="proxima()">
+        ⏭️ Próxima
+      </button>
+
+    </div>
+
+    <div class="aviso">
+      🎵 O player utiliza o sistema oficial do YouTube.
+      O comportamento de anúncios e reprodução em segundo plano
+      é controlado pelo próprio YouTube e pelo navegador.
     </div>
 
   </div>
@@ -141,66 +192,180 @@ Charlie Brown Jr. - Só os Loucos Sabem"></textarea>
 
 <script>
 
-function organizarLista() {
+  let player;
 
-  const texto = document.getElementById("lista").value.trim();
-  const resultado = document.getElementById("resultado");
+  let fila = [];
 
-  if (!texto) {
-    resultado.innerHTML =
-      '<div class="vazio">Cole uma lista de músicas primeiro.</div>';
-    return;
+  let indiceAtual = 0;
+
+  /*
+    Estes IDs são apenas para testar o funcionamento
+    do player e da troca automática.
+  */
+
+  const videosTeste = [
+    "dQw4w9WgXcQ",
+    "9bZkp7q19f0",
+    "kJQP7kiw5Fk"
+  ];
+
+
+  // Carrega a API oficial do YouTube
+  let tag = document.createElement("script");
+
+  tag.src = "https://www.youtube.com/iframe_api";
+
+  document.head.appendChild(tag);
+
+
+  // Função chamada automaticamente pelo YouTube
+  function onYouTubeIframeAPIReady() {
+
+    player = new YT.Player("youtube-player", {
+
+      height: "100%",
+
+      width: "100%",
+
+      videoId: videosTeste[0],
+
+      playerVars: {
+        rel: 0
+      },
+
+      events: {
+
+        "onReady": function() {
+
+          document.getElementById("status").innerText =
+            "Player pronto. Clique em ▶️ Play.";
+
+        },
+
+        "onStateChange": mudouEstado
+
+      }
+
+    });
+
   }
 
-  const linhas = texto
-    .split("\n")
-    .map(linha => linha.trim())
-    .filter(linha => linha.length > 0);
 
-  resultado.innerHTML = "";
+  // Detecta quando uma música terminou
+  function mudouEstado(event) {
 
-  linhas.forEach((musica, indice) => {
+    if (event.data === YT.PlayerState.ENDED) {
 
-    const item = document.createElement("div");
-    item.className = "musica";
+      proxima();
 
-    const titulo = document.createElement("strong");
-    titulo.textContent = (indice + 1) + ". " + musica;
+    }
 
-    const link = document.createElement("a");
-
-    link.href =
-      "https://www.youtube.com/results?search_query=" +
-      encodeURIComponent(musica);
-
-    link.target = "_blank";
-
-    link.textContent = "🔎 Procurar no YouTube";
-
-    item.appendChild(titulo);
-    item.appendChild(document.createElement("br"));
-    item.appendChild(link);
-
-    resultado.appendChild(item);
-  });
-}
-
-function interpretarComando() {
-
-  const comando =
-    document.getElementById("comando").value.trim();
-
-  if (!comando) {
-    alert("Escreva primeiro o comando para o Chará.");
-    return;
   }
 
-  alert(
-    "Comando recebido! 🧠\n\n" +
-    comando +
-    "\n\nA interpretação inteligente será nossa próxima etapa."
-  );
-}
+
+  function organizarLista() {
+
+    const texto =
+      document.getElementById("listaMusicas").value;
+
+    const linhas =
+      texto.split("\n")
+      .map(linha => linha.trim())
+      .filter(linha => linha !== "");
+
+    const resultado =
+      document.getElementById("resultado");
+
+    resultado.innerHTML = "";
+
+    fila = linhas;
+
+    indiceAtual = 0;
+
+    linhas.forEach((musica, index) => {
+
+      const li = document.createElement("li");
+
+      li.innerHTML =
+        musica +
+        ' — <a href="https://www.youtube.com/results?search_query=' +
+        encodeURIComponent(musica) +
+        '" target="_blank">🔎 Procurar no YouTube</a>';
+
+      resultado.appendChild(li);
+
+    });
+
+    if (linhas.length > 0) {
+
+      document.getElementById("status").innerText =
+        linhas.length +
+        " músicas adicionadas à sequência.";
+
+    }
+
+  }
+
+
+  function playAtual() {
+
+    if (!player) return;
+
+    player.playVideo();
+
+    document.getElementById("status").innerText =
+      "▶️ Reproduzindo.";
+
+  }
+
+
+  function pausar() {
+
+    if (!player) return;
+
+    player.pauseVideo();
+
+    document.getElementById("status").innerText =
+      "⏸️ Pausado.";
+
+  }
+
+
+  function proxima() {
+
+    if (!player) return;
+
+    indiceAtual++;
+
+    if (indiceAtual >= videosTeste.length) {
+
+      indiceAtual = 0;
+
+    }
+
+    player.loadVideoById(videosTeste[indiceAtual]);
+
+    document.getElementById("status").innerText =
+      "▶️ Próxima música.";
+
+  }
+
+
+  function anterior() {
+
+    if (!player) return;
+
+    indiceAtual--;
+
+    if (indiceAtual < 0) {
+
+      indiceAtual = videosTeste.length - 1;
+
+    }
+
+    player.loadVideoById(videosTeste[indiceAtual]);
+
+  }
 
 </script>
 
