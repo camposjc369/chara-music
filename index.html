@@ -3,274 +3,652 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chará Music</title>
+
+  <title>🎵 Chará Music</title>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      background: #f5f5f5;
+    * {
+      box-sizing: border-box;
     }
 
-    h1 {
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #111827, #312e81, #7c3aed);
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    .topo {
       text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .topo h1 {
+      font-size: 36px;
+      margin-bottom: 5px;
+    }
+
+    .topo p {
+      opacity: 0.85;
+      margin-top: 0;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .card h2 {
+      margin-top: 0;
     }
 
     textarea {
       width: 100%;
       min-height: 120px;
-      margin-bottom: 10px;
-      padding: 10px;
-      box-sizing: border-box;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 15px;
+      resize: vertical;
+      outline: none;
+      margin-bottom: 12px;
     }
 
     button {
-      padding: 10px 15px;
-      margin: 5px;
-      cursor: pointer;
       border: none;
-      border-radius: 6px;
+      border-radius: 10px;
+      padding: 11px 16px;
+      margin: 4px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-principal {
+      background: #facc15;
+      color: #111827;
+    }
+
+    .btn-secundario {
+      background: rgba(255,255,255,0.18);
+      color: white;
+    }
+
+    .btn-play {
+      background: #22c55e;
+      color: white;
     }
 
     .musica {
-      background: white;
-      padding: 12px;
-      margin: 8px 0;
-      border-radius: 8px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 14px;
+      margin: 10px 0;
     }
 
-    .tocar {
-      background: #222;
-      color: white;
+    .musica strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .status {
+      text-align: center;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.20);
     }
 
     #youtube-player {
       width: 100%;
-      max-width: 640px;
-      margin: 20px auto;
+      max-width: 700px;
+      margin: 15px auto;
       aspect-ratio: 16 / 9;
+    }
+
+    #youtube-player iframe {
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
     }
 
     .controles {
       text-align: center;
+    }
+
+    .observacao {
+      font-size: 13px;
+      opacity: 0.75;
+      margin-top: 10px;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>🎵 Chará Music</h1>
+<div class="container">
 
-  <p>Seu organizador musical pessoal</p>
-
-  <h3>🎵 Importar lista de músicas</h3>
-
-  <textarea id="lista" placeholder="Exemplo:
-Jorge Ben Jor - Taj Mahal | https://www.youtube.com/watch?v=dQw4w9WgXcQ
-Zeca Pagodinho - Deixa a Vida Me Levar | https://www.youtube.com/watch?v=9bZkp7q19f0"></textarea>
-
-  <button onclick="interpretarLista()">🎵 Interpretar lista</button>
-
-  <h3>🎧 Minha sequência</h3>
-
-  <div id="sequencia"></div>
-
-  <h3>▶️ Player</h3>
-
-  <div id="youtube-player"></div>
-
-  <div class="controles">
-    <button onclick="tocar()">▶️ Play</button>
-    <button onclick="pausar()">⏸️ Pausar</button>
-    <button onclick="anterior()">⏮️ Anterior</button>
-    <button onclick="proxima()">⏭️ Próxima</button>
+  <div class="topo">
+    <h1>🎵 Chará Music</h1>
+    <p>Seu organizador musical pessoal</p>
   </div>
 
-  <script src="https://www.youtube.com/iframe_api"></script>
 
-  <script>
+  <div class="card">
 
-    let player;
-    let fila = [];
-    let indiceAtual = 0;
+    <h2>🧠 Comando para o Chará</h2>
 
-    function onYouTubeIframeAPIReady() {
+    <textarea id="comando"
+      placeholder="Exemplo:
+Monte uma sequência de aproximadamente 1 hora.
+Comece animado, misture pagode, samba e músicas internacionais e termine mais tranquilo."></textarea>
 
-      player = new YT.Player('youtube-player', {
+    <button class="btn-principal" onclick="interpretarComando()">
+      🧠 Interpretar comando
+    </button>
 
-        height: '360',
-        width: '640',
+    <div id="resultadoComando" class="status">
+      Aguardando comando...
+    </div>
 
-        videoId: '',
+  </div>
 
-        playerVars: {
-          playsinline: 1
+
+  <div class="card">
+
+    <h2>🎵 Importar lista de músicas</h2>
+
+    <textarea id="lista"
+      placeholder="Coloque uma música por linha.
+
+Para o teste com o player, use:
+Jorge Ben Jor - Taj Mahal
+Zeca Pagodinho - Deixa a Vida Me Levar
+Charlie Brown Jr. - Só os Loucos Sabem
+Bruno Mars - Just The Way You Are"></textarea>
+
+    <button class="btn-principal" onclick="interpretarLista()">
+      🎵 Interpretar lista
+    </button>
+
+    <button class="btn-secundario" onclick="organizarLista()">
+      📋 Organizar lista
+    </button>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>🎧 Minha sequência</h2>
+
+    <div id="sequencia">
+      Nenhuma música adicionada ainda.
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>▶️ Player</h2>
+
+    <div id="youtube-player"></div>
+
+    <div class="controles">
+
+      <button class="btn-play" onclick="tocar()">
+        ▶️ Play
+      </button>
+
+      <button class="btn-secundario" onclick="pausar()">
+        ⏸️ Pausar
+      </button>
+
+      <button class="btn-secundario" onclick="anterior()">
+        ⏮️ Anterior
+      </button>
+
+      <button class="btn-secundario" onclick="proxima()">
+        ⏭️ Próxima
+      </button>
+
+    </div>
+
+    <div id="statusPlayer" class="status">
+      Inicializando player...
+    </div>
+
+    <div class="observacao">
+      O player utiliza o YouTube oficialmente. A sequência avança automaticamente quando a música termina.
+    </div>
+
+  </div>
+
+</div>
+
+
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+
+  let player = null;
+
+  let fila = [];
+
+  let indiceAtual = 0;
+
+
+  /*
+    IDs reais de vídeos para o nosso primeiro teste.
+
+    Eles ficam associados às músicas pelo nome.
+  */
+
+  const videosTeste = {
+
+    "jorge ben jor - taj mahal":
+      "qfR5Zq3nG4I",
+
+    "zeca pagodinho - deixa a vida me levar":
+      "oTREAvZbmME",
+
+    "charlie brown jr. - só os loucos sabem":
+      "JRJj4z-prvM",
+
+    "bruno mars - just the way you are":
+      "LjhCEhWiKXk"
+
+  };
+
+
+  /*
+    Quando a API do YouTube estiver pronta
+  */
+
+  function onYouTubeIframeAPIReady() {
+
+    player = new YT.Player("youtube-player", {
+
+      width: "100%",
+
+      height: "390",
+
+      videoId: "",
+
+      playerVars: {
+        playsinline: 1,
+        rel: 0
+      },
+
+      events: {
+
+        onReady: function() {
+
+          document.getElementById("statusPlayer").innerText =
+            "✅ Player pronto. Escolha uma música.";
+
         },
 
-        events: {
-          onStateChange: mudouEstado
-        }
+        onStateChange: mudouEstado
 
-      });
+      }
+
+    });
+
+  }
+
+
+  /*
+    Comando do Chará
+  */
+
+  function interpretarComando() {
+
+    const comando =
+      document.getElementById("comando").value.trim();
+
+    if (!comando) {
+
+      document.getElementById("resultadoComando").innerText =
+        "Digite um comando primeiro.";
+
+      return;
 
     }
 
-    function interpretarLista() {
+    document.getElementById("resultadoComando").innerText =
+      "🧠 Comando recebido pelo Chará: " + comando;
 
-      const texto = document.getElementById("lista").value;
+  }
 
-      const linhas = texto.split("\n");
 
-      fila = [];
+  /*
+    Lê a lista
+  */
 
-      linhas.forEach(linha => {
+  function interpretarLista() {
 
-        linha = linha.trim();
+    const texto =
+      document.getElementById("lista").value.trim();
 
-        if (!linha) return;
+    if (!texto) {
+
+      alert("Digite algumas músicas primeiro.");
+
+      return;
+
+    }
+
+    const linhas = texto.split("\n");
+
+    fila = [];
+
+    linhas.forEach(function(linha) {
+
+      linha = linha.trim();
+
+      if (!linha) return;
+
+      let nome = linha;
+
+      let videoId = null;
+
+
+      /*
+        Primeiro tenta encontrar pelo nome
+      */
+
+      const chave = nome.toLowerCase();
+
+      if (videosTeste[chave]) {
+
+        videoId = videosTeste[chave];
+
+      }
+
+
+      /*
+        Também aceita:
+        Música | URL do YouTube
+      */
+
+      if (linha.includes("|")) {
 
         const partes = linha.split("|");
 
-        const nome = partes[0].trim();
+        nome = partes[0].trim();
 
-        const url = partes[1] ? partes[1].trim() : "";
+        const url = partes[1].trim();
 
-        const videoId = extrairVideoId(url);
+        videoId = extrairVideoId(url);
 
-        fila.push({
-          nome: nome,
-          videoId: videoId
-        });
+      }
+
+
+      fila.push({
+
+        nome: nome,
+
+        videoId: videoId
 
       });
 
-      mostrarLista();
+    });
+
+    indiceAtual = 0;
+
+    mostrarLista();
+
+  }
+
+
+  /*
+    Organizar lista
+  */
+
+  function organizarLista() {
+
+    if (fila.length === 0) {
+
+      interpretarLista();
+
+      return;
 
     }
 
-    function extrairVideoId(url) {
+    /*
+      Aqui deixamos a organização preparada
+      para receber futuramente as regras do Chará.
+    */
 
-      if (!url) return null;
+    fila.sort(function(a, b) {
 
-      const resultado = url.match(
+      return a.nome.localeCompare(b.nome);
+
+    });
+
+    indiceAtual = 0;
+
+    mostrarLista();
+
+  }
+
+
+  /*
+    Mostra a sequência
+  */
+
+  function mostrarLista() {
+
+    const area =
+      document.getElementById("sequencia");
+
+    area.innerHTML = "";
+
+    if (fila.length === 0) {
+
+      area.innerHTML =
+        "Nenhuma música adicionada.";
+
+      return;
+
+    }
+
+    fila.forEach(function(musica, index) {
+
+      const div =
+        document.createElement("div");
+
+      div.className = "musica";
+
+
+      let botao = "";
+
+      if (musica.videoId) {
+
+        botao =
+          `<button class="btn-play"
+             onclick="tocarMusica(${index})">
+             ▶️ Tocar no player
+           </button>`;
+
+      } else {
+
+        botao =
+          `<div class="observacao">
+             ⚠️ Vídeo do YouTube não associado ainda.
+           </div>`;
+
+      }
+
+
+      div.innerHTML =
+
+        `<strong>
+          ${index + 1}. ${musica.nome}
+        </strong>
+        ${botao}`;
+
+      area.appendChild(div);
+
+    });
+
+  }
+
+
+  /*
+    Toca uma música específica
+  */
+
+  function tocarMusica(index) {
+
+    if (!player) {
+
+      alert("O player ainda está carregando.");
+
+      return;
+
+    }
+
+    const musica = fila[index];
+
+    if (!musica.videoId) {
+
+      alert(
+        "Ainda não existe um vídeo do YouTube associado a esta música."
+      );
+
+      return;
+
+    }
+
+    indiceAtual = index;
+
+    player.loadVideoById(musica.videoId);
+
+    document.getElementById("statusPlayer").innerText =
+      "▶️ Tocando: " + musica.nome;
+
+  }
+
+
+  /*
+    Play
+  */
+
+  function tocar() {
+
+    if (!player) return;
+
+    player.playVideo();
+
+  }
+
+
+  /*
+    Pausar
+  */
+
+  function pausar() {
+
+    if (!player) return;
+
+    player.pauseVideo();
+
+  }
+
+
+  /*
+    Próxima
+  */
+
+  function proxima() {
+
+    if (fila.length === 0) return;
+
+    indiceAtual++;
+
+    if (indiceAtual >= fila.length) {
+
+      indiceAtual = 0;
+
+    }
+
+    tocarMusica(indiceAtual);
+
+  }
+
+
+  /*
+    Anterior
+  */
+
+  function anterior() {
+
+    if (fila.length === 0) return;
+
+    indiceAtual--;
+
+    if (indiceAtual < 0) {
+
+      indiceAtual = fila.length - 1;
+
+    }
+
+    tocarMusica(indiceAtual);
+
+  }
+
+
+  /*
+    Detecta quando uma música termina
+  */
+
+  function mudouEstado(event) {
+
+    if (
+      event.data === YT.PlayerState.ENDED
+    ) {
+
+      proxima();
+
+    }
+
+  }
+
+
+  /*
+    Extrai ID de links do YouTube
+  */
+
+  function extrairVideoId(url) {
+
+    if (!url) return null;
+
+    const resultado =
+      url.match(
         /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/
       );
 
-      return resultado ? resultado[1] : null;
+    return resultado
+      ? resultado[1]
+      : null;
 
-    }
+  }
 
-    function mostrarLista() {
-
-      const area = document.getElementById("sequencia");
-
-      area.innerHTML = "";
-
-      fila.forEach((musica, index) => {
-
-        const div = document.createElement("div");
-
-        div.className = "musica";
-
-        div.innerHTML = `
-          <strong>${index + 1}. ${musica.nome}</strong>
-          <br>
-          ${
-            musica.videoId
-            ? `<button class="tocar" onclick="tocarMusica(${index})">
-                 ▶️ Tocar no player
-               </button>`
-            : `<span>⚠️ Sem link do YouTube</span>`
-          }
-        `;
-
-        area.appendChild(div);
-
-      });
-
-    }
-
-    function tocarMusica(index) {
-
-      if (!player) {
-
-        alert("O player ainda está carregando. Aguarde alguns segundos.");
-
-        return;
-
-      }
-
-      if (!fila[index].videoId) {
-
-        alert("Essa música não possui um link do YouTube.");
-
-        return;
-
-      }
-
-      indiceAtual = index;
-
-      player.loadVideoById(fila[index].videoId);
-
-    }
-
-    function tocar() {
-
-      if (player) {
-        player.playVideo();
-      }
-
-    }
-
-    function pausar() {
-
-      if (player) {
-        player.pauseVideo();
-      }
-
-    }
-
-    function proxima() {
-
-      if (fila.length === 0) return;
-
-      indiceAtual++;
-
-      if (indiceAtual >= fila.length) {
-        indiceAtual = 0;
-      }
-
-      tocarMusica(indiceAtual);
-
-    }
-
-    function anterior() {
-
-      if (fila.length === 0) return;
-
-      indiceAtual--;
-
-      if (indiceAtual < 0) {
-        indiceAtual = fila.length - 1;
-      }
-
-      tocarMusica(indiceAtual);
-
-    }
-
-    function mudouEstado(event) {
-
-      if (event.data === YT.PlayerState.ENDED) {
-
-        proxima();
-
-      }
-
-    }
-
-  </script>
+</script>
 
 </body>
 </html>
