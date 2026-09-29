@@ -30,6 +30,10 @@
     .topo { text-align: center; margin: 8px 0 24px; }
     .topo h1 { margin: 0 0 4px; font-size: clamp(30px, 7vw, 38px); letter-spacing: -.5px; }
     .topo p { margin: 0; color: var(--muted); }
+    .intro { margin: 12px auto 0; max-width: 680px; color: var(--muted); }
+    .help { margin: 12px auto 0; max-width: 680px; text-align: left; }
+    .help summary { color: var(--blue); cursor: pointer; font-weight: 600; }
+    .help ol { margin-bottom: 0; padding-left: 22px; color: var(--muted); }
     .card {
       margin-bottom: 18px;
       padding: 20px;
@@ -73,8 +77,14 @@
     .btn-principal:hover { background: #1688df; border-color: #1688df; }
     .btn-play { background: #303b43; border-color: #466171; color: var(--blue); }
     .btn-play:hover { background: #394c58; }
-    .musica { margin: 9px 0; padding: 13px; border: 1px solid var(--line); border-radius: 10px; background: #252525; }
-    .musica strong { display: block; margin-bottom: 7px; overflow-wrap: anywhere; }
+    .musica { margin: 9px 0; padding: 13px; border: 1px solid var(--line); border-radius: 10px; background: #252525; cursor: pointer; transition: border-color .15s, background .15s; }
+    .musica:hover, .musica:focus-visible { border-color: var(--blue); background: #2b3439; outline: none; }
+    .musica.tocando { border-color: var(--blue); background: #18313e; }
+    .musica strong { display: block; overflow-wrap: anywhere; }
+    .musica .observacao { margin-top: 5px; text-align: left; }
+    .section-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+    .section-actions button { min-width: 190px; }
+    .collapsed { display: none; }
     .status { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: #242424; color: var(--muted); text-align: center; }
     .observacao { margin-top: 12px; color: var(--muted); font-size: 13px; text-align: center; }
     .video-shell { position: relative; width: 100%; max-width: 760px; margin: 0 auto 16px; overflow: hidden; aspect-ratio: 16 / 9; border: 1px solid var(--line); border-radius: 12px; background: #080808; }
@@ -109,18 +119,16 @@
     <div class="topo">
       <h1>🎵 Chará Music</h1>
       <p>Seu organizador musical pessoal</p>
-    </div>
-
-    <div class="card">
-      <h2>🎵 Importar lista de músicas</h2>
-      <textarea id="lista" placeholder="Uma música por linha. Use o formato:&#10;Música | ID_DO_VIDEO&#10;&#10;Exemplo:&#10;Jorge Ben Jor - Taj Mahal | rfrpOhC6858&#10;Zeca Pagodinho - Deixa a Vida Me Levar | oTREAvZbmME"></textarea>
-      <button class="btn-principal" onclick="interpretarLista()">🎵 Interpretar lista</button>
-      <button onclick="organizarLista()">📋 Organizar lista</button>
-    </div>
-
-    <div class="card">
-      <h2>🎧 Minha sequência</h2>
-      <div id="sequencia">Nenhuma música adicionada ainda.</div>
+      <div class="intro">Monte sua sequência com vídeos do YouTube e curta tudo em um só player.</div>
+      <details class="help">
+        <summary>❔ Como usar, passo a passo</summary>
+        <ol>
+          <li>Toque em <strong>Adicionar músicas</strong>.</li>
+          <li>Cole uma música por linha neste formato: <code>Música | ID_DO_VIDEO</code>.</li>
+          <li>Toque em <strong>Interpretar lista</strong> para carregar as faixas.</li>
+          <li>Abra <strong>Minha sequência</strong> e toque numa música para começar por ela.</li>
+        </ol>
+      </details>
     </div>
 
     <div class="card player-card">
@@ -156,6 +164,23 @@
       <div id="statusPlayer" class="status" role="status" aria-live="polite">Inicializando player...</div>
       <div class="observacao">Use a barra para avançar ou voltar. Embaralhar muda a próxima música; repetir alterna entre faixa, sequência ou desligado.</div>
     </div>
+
+    <div class="section-actions">
+      <button id="toggleImport" onclick="alternarPainel('importPanel', 'toggleImport')" aria-expanded="false">➕ Adicionar músicas</button>
+      <button id="toggleQueue" onclick="alternarPainel('queuePanel', 'toggleQueue')" aria-expanded="false">🎶 Minha sequência (0)</button>
+    </div>
+
+    <div id="importPanel" class="card collapsed">
+      <h2>🎵 Importar lista de músicas</h2>
+      <textarea id="lista" placeholder="Uma música por linha. Use o formato:&#10;Música | ID_DO_VIDEO&#10;&#10;Exemplo:&#10;Jorge Ben Jor - Taj Mahal | rfrpOhC6858&#10;Zeca Pagodinho - Deixa a Vida Me Levar | oTREAvZbmME"></textarea>
+      <button class="btn-principal" onclick="interpretarLista()">🎵 Interpretar lista</button>
+      <button onclick="organizarLista()">📋 Organizar lista</button>
+    </div>
+
+    <div id="queuePanel" class="card collapsed">
+      <h2>🎧 Minha sequência <span id="queueCount">(0 músicas)</span></h2>
+      <div id="sequencia">Nenhuma música adicionada ainda.</div>
+    </div>
   </div>
 
   <script src="https://www.youtube.com/iframe_api"></script>
@@ -168,6 +193,25 @@
     // 0 = desligado, 1 = repetir sequência, 2 = repetir a música atual.
     let modoRepetir = 0;
     let atualizador = null;
+
+    function alternarPainel(painelId, botaoId) {
+      const painel = document.getElementById(painelId);
+      const botao = document.getElementById(botaoId);
+      const vaiAbrir = painel.classList.contains("collapsed");
+      painel.classList.toggle("collapsed", !vaiAbrir);
+      botao.setAttribute("aria-expanded", String(vaiAbrir));
+      if (botaoId === "toggleImport") botao.textContent = vaiAbrir ? "➖ Fechar adicionar músicas" : "➕ Adicionar músicas";
+      if (botaoId === "toggleQueue") botao.textContent = vaiAbrir ? "🔽 Ocultar sequência (" + fila.length + ")" : "🎶 Minha sequência (" + fila.length + ")";
+    }
+
+    function atualizarContagem() {
+      const quantidade = fila.length;
+      document.getElementById("queueCount").textContent = "(" + quantidade + (quantidade === 1 ? " música" : " músicas") + ")";
+      const botao = document.getElementById("toggleQueue");
+      botao.textContent = botao.getAttribute("aria-expanded") === "true"
+        ? "🔽 Ocultar sequência (" + quantidade + ")"
+        : "🎶 Minha sequência (" + quantidade + ")";
+    }
 
     const videosTeste = {
       "jorge ben jor - taj mahal": "rfrpOhC6858",
@@ -216,6 +260,13 @@
       indiceAtual = 0;
       prepararEmbaralhamento();
       mostrarLista();
+      atualizarContagem();
+      document.getElementById("queuePanel").classList.remove("collapsed");
+      document.getElementById("toggleQueue").setAttribute("aria-expanded", "true");
+      document.getElementById("toggleQueue").textContent = "🔽 Ocultar sequência (" + fila.length + ")";
+      document.getElementById("importPanel").classList.add("collapsed");
+      document.getElementById("toggleImport").setAttribute("aria-expanded", "false");
+      document.getElementById("toggleImport").textContent = "➕ Adicionar músicas";
       document.getElementById("nowPlaying").textContent = "Escolha uma música da sequência.";
       document.getElementById("statusPlayer").innerText = fila.length
         ? "✅ Lista carregada. Escolha uma música para tocar."
@@ -227,6 +278,7 @@
       fila.sort(function(a, b) { return a.nome.localeCompare(b.nome); });
       indiceAtual = 0;
       mostrarLista();
+      atualizarContagem();
     }
 
     function mostrarLista() {
@@ -236,15 +288,22 @@
       fila.forEach(function(musica, index) {
         const div = document.createElement("div");
         div.className = "musica";
+        div.tabIndex = 0;
+        div.setAttribute("role", "button");
+        div.setAttribute("aria-label", "Tocar " + musica.nome);
+        if (index === indiceAtual) div.classList.add("tocando");
         const titulo = document.createElement("strong");
         titulo.textContent = (index + 1) + ". " + musica.nome;
         div.appendChild(titulo);
+        div.onclick = function() { tocarMusica(index); };
+        div.onkeydown = function(event) {
+          if (event.key === "Enter" || event.key === " ") { event.preventDefault(); tocarMusica(index); }
+        };
         if (musica.videoId) {
-          const botao = document.createElement("button");
-          botao.className = "btn-play";
-          botao.textContent = "▶️ Tocar no player";
-          botao.onclick = function() { tocarMusica(index); };
-          div.appendChild(botao);
+          const dica = document.createElement("div");
+          dica.className = "observacao";
+          dica.textContent = "▶️ Toque aqui para tocar";
+          div.appendChild(dica);
         } else {
           const aviso = document.createElement("div");
           aviso.className = "observacao";
