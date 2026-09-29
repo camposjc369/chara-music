@@ -3,28 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#202020">
   <title>🎵 Chará Music</title>
   <style>
+    :root {
+      color-scheme: dark;
+      --bg: #202020;
+      --panel: #2b2b2b;
+      --panel-raised: #333333;
+      --line: #454545;
+      --text: #f5f5f5;
+      --muted: #bdbdbd;
+      --blue: #60cdff;
+      --blue-strong: #0078d4;
+    }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: Arial, sans-serif; background: linear-gradient(135deg, #111827, #312e81, #7c3aed); color: white; min-height: 100vh; padding: 20px; }
-    .container { max-width: 850px; margin: auto; }
-    .topo { text-align: center; margin-bottom: 25px; }
-    .topo h1 { font-size: 36px; margin-bottom: 5px; }
-    .topo p { opacity: 0.85; margin-top: 0; }
-    .card { background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.15); border-radius: 18px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(10px); }
-    .card h2 { margin-top: 0; }
-    textarea { width: 100%; min-height: 120px; border: none; border-radius: 12px; padding: 14px; font-size: 15px; resize: vertical; outline: none; margin-bottom: 12px; }
-    button { border: none; border-radius: 10px; padding: 11px 16px; margin: 4px; font-size: 15px; font-weight: bold; cursor: pointer; }
-    .btn-principal { background: #facc15; color: #111827; }
-    .btn-secundario { background: rgba(255,255,255,0.18); color: white; }
-    .btn-play { background: #22c55e; color: white; }
-    .musica { background: rgba(255,255,255,0.12); border-radius: 12px; padding: 14px; margin: 10px 0; }
-    .musica strong { display: block; margin-bottom: 8px; }
-    .status { text-align: center; padding: 10px; margin-top: 10px; border-radius: 10px; background: rgba(0,0,0,0.20); }
-    #youtube-player { width: 100%; max-width: 700px; margin: 15px auto; aspect-ratio: 16 / 9; }
-    #youtube-player iframe { width: 100%; height: 100%; border-radius: 14px; }
-    .controles { text-align: center; }
-    .observacao { font-size: 13px; opacity: 0.75; margin-top: 10px; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 22px;
+      background: radial-gradient(ellipse at top, #303941 0, var(--bg) 55%);
+      color: var(--text);
+      font: 16px/1.5 "Segoe UI", Arial, sans-serif;
+    }
+    .container { width: min(100%, 900px); margin: 0 auto; }
+    .topo { text-align: center; margin: 8px 0 24px; }
+    .topo h1 { margin: 0 0 4px; font-size: clamp(30px, 7vw, 38px); letter-spacing: -.5px; }
+    .topo p { margin: 0; color: var(--muted); }
+    .card {
+      margin-bottom: 18px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--panel) 94%, transparent);
+      box-shadow: 0 8px 24px #0004;
+    }
+    .card h2 { margin: 0 0 14px; font-size: 20px; }
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 125px;
+      margin: 0 0 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      resize: vertical;
+      background: #1b1b1b;
+      color: var(--text);
+      font: 15px/1.5 Consolas, "Courier New", monospace;
+    }
+    textarea:focus, button:focus-visible, input:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    textarea::placeholder { color: #969696; }
+    button {
+      min-height: 42px;
+      margin: 4px;
+      padding: 10px 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-raised);
+      color: var(--text);
+      font: 600 15px "Segoe UI", Arial, sans-serif;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, transform .15s;
+    }
+    button:hover { background: #414141; border-color: #666; }
+    button:active { transform: scale(.98); }
+    .btn-principal { background: var(--blue-strong); border-color: var(--blue-strong); color: #fff; }
+    .btn-principal:hover { background: #1688df; border-color: #1688df; }
+    .btn-play { background: #303b43; border-color: #466171; color: var(--blue); }
+    .btn-play:hover { background: #394c58; }
+    .musica { margin: 9px 0; padding: 13px; border: 1px solid var(--line); border-radius: 10px; background: #252525; }
+    .musica strong { display: block; margin-bottom: 7px; overflow-wrap: anywhere; }
+    .status { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: #242424; color: var(--muted); text-align: center; }
+    .observacao { margin-top: 12px; color: var(--muted); font-size: 13px; text-align: center; }
+    .video-shell { position: relative; width: 100%; max-width: 760px; margin: 0 auto 16px; overflow: hidden; aspect-ratio: 16 / 9; border: 1px solid var(--line); border-radius: 12px; background: #080808; }
+    #youtube-player { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #youtube-player iframe { width: 100%; height: 100%; border: 0; }
+    .now-playing { margin: 0 0 9px; text-align: center; font-size: 17px; font-weight: 600; overflow-wrap: anywhere; }
+    .progress-area { display: grid; grid-template-columns: 48px 1fr 48px; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+    input[type="range"] { width: 100%; accent-color: var(--blue); cursor: pointer; }
+    #progress { margin: 0; }
+    .main-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin: 12px 0 4px; }
+    .main-controls button { min-width: 54px; }
+    .main-controls .primary-control { min-width: 112px; background: var(--blue-strong); border-color: var(--blue-strong); color: white; }
+    .extra-controls { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .toggle-controls { display: flex; flex-wrap: wrap; gap: 5px; }
+    .toggle.active { border-color: var(--blue); color: var(--blue); background: #18313e; }
+    .volume-control { display: flex; align-items: center; gap: 9px; min-width: min(240px, 100%); color: var(--muted); }
+    .volume-control input { max-width: 150px; }
+    @media (max-width: 540px) {
+      body { padding: 12px; }
+      .card { padding: 15px; }
+      .topo { margin-top: 4px; }
+      .extra-controls { align-items: stretch; flex-direction: column; }
+      .volume-control { width: 100%; }
+      .volume-control input { max-width: none; flex: 1; }
+      .toggle-controls { justify-content: center; }
+      .toggle-controls button { flex: 1; }
+    }
   </style>
 </head>
 <body>
@@ -36,9 +113,9 @@
 
     <div class="card">
       <h2>🎵 Importar lista de músicas</h2>
-      <textarea id="lista" placeholder="Coloque uma música por linha.&#10;&#10;Você pode usar o nome conhecido ou o formato manual:&#10;Música | ID_DO_VIDEO&#10;&#10;Exemplo:&#10;Jorge Ben Jor - Taj Mahal | qfR5Zq3nG4I&#10;Zeca Pagodinho - Deixa a Vida Me Levar | oTREAvZbmME"></textarea>
+      <textarea id="lista" placeholder="Uma música por linha. Use o formato:&#10;Música | ID_DO_VIDEO&#10;&#10;Exemplo:&#10;Jorge Ben Jor - Taj Mahal | rfrpOhC6858&#10;Zeca Pagodinho - Deixa a Vida Me Levar | oTREAvZbmME"></textarea>
       <button class="btn-principal" onclick="interpretarLista()">🎵 Interpretar lista</button>
-      <button class="btn-secundario" onclick="organizarLista()">📋 Organizar lista</button>
+      <button onclick="organizarLista()">📋 Organizar lista</button>
     </div>
 
     <div class="card">
@@ -46,17 +123,38 @@
       <div id="sequencia">Nenhuma música adicionada ainda.</div>
     </div>
 
-    <div class="card">
+    <div class="card player-card">
       <h2>▶️ Player</h2>
-      <div id="youtube-player"></div>
-      <div class="controles">
-        <button class="btn-play" onclick="tocar()">▶️ Play</button>
-        <button class="btn-secundario" onclick="pausar()">⏸️ Pausar</button>
-        <button class="btn-secundario" onclick="anterior()">⏮️ Anterior</button>
-        <button class="btn-secundario" onclick="proxima()">⏭️ Próxima</button>
+      <div class="video-shell"><div id="youtube-player"></div></div>
+      <div id="nowPlaying" class="now-playing">Escolha uma música da sequência.</div>
+
+      <div class="progress-area">
+        <span id="currentTime">0:00</span>
+        <input id="progress" type="range" min="0" max="1000" value="0" step="1" aria-label="Avançar ou voltar na música" disabled>
+        <span id="duration">0:00</span>
       </div>
-      <div id="statusPlayer" class="status">Inicializando player...</div>
-      <div class="observacao">O player utiliza o YouTube oficialmente. A sequência avança automaticamente quando a música termina.</div>
+
+      <div class="main-controls">
+        <button onclick="anterior()" aria-label="Música anterior" title="Anterior">⏮</button>
+        <button id="playPause" class="primary-control" onclick="tocar()">▶️ Play</button>
+        <button onclick="pausar()" aria-label="Pausar música" title="Pausar">⏸</button>
+        <button onclick="proxima()" aria-label="Próxima música" title="Próxima">⏭</button>
+      </div>
+
+      <div class="extra-controls">
+        <div class="toggle-controls">
+          <button id="shuffleButton" class="toggle" onclick="alternarEmbaralhar()" aria-pressed="false">🔀 Embaralhar</button>
+          <button id="repeatButton" class="toggle" onclick="alternarRepetir()" aria-pressed="false">🔁 Repetir: desligado</button>
+        </div>
+        <label class="volume-control" for="volume">
+          <span>🔊 Volume</span>
+          <input id="volume" type="range" min="0" max="100" value="70" aria-label="Volume">
+          <span id="volumeValue">70%</span>
+        </label>
+      </div>
+
+      <div id="statusPlayer" class="status" role="status" aria-live="polite">Inicializando player...</div>
+      <div class="observacao">Use a barra para avançar ou voltar. Embaralhar muda a próxima música; repetir alterna entre faixa, sequência ou desligado.</div>
     </div>
   </div>
 
@@ -65,10 +163,14 @@
     let player = null;
     let fila = [];
     let indiceAtual = 0;
+    let embaralhar = false;
+    let restantesEmbaralhadas = new Set();
+    // 0 = desligado, 1 = repetir sequência, 2 = repetir a música atual.
+    let modoRepetir = 0;
+    let atualizador = null;
 
-    // Vídeos de teste associados às músicas pelo nome.
     const videosTeste = {
-      "jorge ben jor - taj mahal": "qfR5Zq3nG4I",
+      "jorge ben jor - taj mahal": "rfrpOhC6858",
       "zeca pagodinho - deixa a vida me levar": "oTREAvZbmME",
       "charlie brown jr. - só os loucos sabem": "JRJj4z-prvM",
       "bruno mars - just the way you are": "LjhCEhWiKXk"
@@ -76,10 +178,11 @@
 
     function onYouTubeIframeAPIReady() {
       player = new YT.Player("youtube-player", {
-        width: "100%", height: "390", videoId: "",
+        width: "100%", height: "100%", videoId: "",
         playerVars: { playsinline: 1, rel: 0 },
         events: {
           onReady: function() {
+            player.setVolume(Number(document.getElementById("volume").value));
             document.getElementById("statusPlayer").innerText = "✅ Player pronto. Escolha uma música.";
           },
           onStateChange: mudouEstado,
@@ -92,43 +195,35 @@
 
     function interpretarLista() {
       const texto = document.getElementById("lista").value.trim();
-      if (!texto) {
-        alert("Digite algumas músicas primeiro.");
-        return;
-      }
+      if (!texto) { alert("Digite algumas músicas primeiro."); return; }
 
       fila = [];
-      const linhas = texto.split(/\r?\n/);
-      linhas.forEach(function(linha) {
+      texto.split(/\r?\n/).forEach(function(linha) {
         linha = linha.trim();
         if (!linha) return;
-
         let nome = linha;
         let videoId = null;
         const separador = linha.lastIndexOf("|");
-
         if (separador >= 0) {
           nome = linha.slice(0, separador).trim();
           videoId = extrairVideoId(linha.slice(separador + 1).trim());
         } else {
           videoId = videosTeste[nome.toLowerCase()] || null;
         }
-
         if (nome) fila.push({ nome: nome, videoId: videoId });
       });
 
       indiceAtual = 0;
+      prepararEmbaralhamento();
       mostrarLista();
+      document.getElementById("nowPlaying").textContent = "Escolha uma música da sequência.";
       document.getElementById("statusPlayer").innerText = fila.length
         ? "✅ Lista carregada. Escolha uma música para tocar."
         : "⚠️ Não encontrei músicas válidas na lista.";
     }
 
     function organizarLista() {
-      if (fila.length === 0) {
-        interpretarLista();
-        return;
-      }
+      if (fila.length === 0) { interpretarLista(); return; }
       fila.sort(function(a, b) { return a.nome.localeCompare(b.nome); });
       indiceAtual = 0;
       mostrarLista();
@@ -136,19 +231,14 @@
 
     function mostrarLista() {
       const area = document.getElementById("sequencia");
-      area.innerHTML = "";
-      if (fila.length === 0) {
-        area.innerHTML = "Nenhuma música adicionada.";
-        return;
-      }
-
+      area.replaceChildren();
+      if (fila.length === 0) { area.textContent = "Nenhuma música adicionada."; return; }
       fila.forEach(function(musica, index) {
         const div = document.createElement("div");
         div.className = "musica";
         const titulo = document.createElement("strong");
         titulo.textContent = (index + 1) + ". " + musica.nome;
         div.appendChild(titulo);
-
         if (musica.videoId) {
           const botao = document.createElement("button");
           botao.className = "btn-play";
@@ -166,55 +256,150 @@
     }
 
     function tocarMusica(index) {
-      if (!player) {
-        alert("O player ainda está carregando.");
-        return;
-      }
+      if (!player) { alert("O player ainda está carregando."); return; }
       const musica = fila[index];
       if (!musica || !musica.videoId) {
         alert("Ainda não existe um ID de vídeo do YouTube associado a esta música.");
         return;
       }
       indiceAtual = index;
+      restantesEmbaralhadas.delete(index);
       player.loadVideoById(musica.videoId);
+      document.getElementById("nowPlaying").textContent = "🎵 " + musica.nome;
       document.getElementById("statusPlayer").innerText = "▶️ Tocando: " + musica.nome;
+      document.getElementById("progress").disabled = false;
+      mostrarLista();
     }
 
     function tocar() {
       if (!player) return;
-      if (fila.length && (!player.getVideoData || !player.getVideoData().video_id)) {
-        tocarMusica(indiceAtual);
-      } else {
-        player.playVideo();
+      if (fila.length && (!player.getVideoData || !player.getVideoData().video_id)) tocarMusica(indiceAtual);
+      else player.playVideo();
+    }
+
+    function pausar() { if (player) player.pauseVideo(); }
+
+    function prepararEmbaralhamento() {
+      restantesEmbaralhadas = new Set();
+      fila.forEach(function(_, index) {
+        if (index !== indiceAtual) restantesEmbaralhadas.add(index);
+      });
+    }
+
+    function proxima(automaticamente = false) {
+      if (!fila.length) return;
+      if (embaralhar && fila.length > 1) {
+        if (restantesEmbaralhadas.size === 0) {
+          if (automaticamente && modoRepetir !== 1) {
+            document.getElementById("statusPlayer").innerText = "✅ A sequência terminou.";
+            document.getElementById("nowPlaying").textContent = "✅ Fim da sequência.";
+            return;
+          }
+          prepararEmbaralhamento();
+        }
+        const opcoes = Array.from(restantesEmbaralhadas);
+        const escolhido = opcoes[Math.floor(Math.random() * opcoes.length)];
+        tocarMusica(escolhido);
+        return;
       }
-    }
-
-    function pausar() {
-      if (player) player.pauseVideo();
-    }
-
-    function proxima() {
-      if (fila.length === 0) return;
-      indiceAtual++;
-      if (indiceAtual >= fila.length) indiceAtual = 0;
-      tocarMusica(indiceAtual);
+      if (automaticamente && indiceAtual === fila.length - 1 && modoRepetir !== 1) {
+        document.getElementById("statusPlayer").innerText = "✅ A sequência terminou.";
+        document.getElementById("nowPlaying").textContent = "✅ Fim da sequência.";
+        return;
+      }
+      tocarMusica((indiceAtual + 1) % fila.length);
     }
 
     function anterior() {
-      if (fila.length === 0) return;
-      indiceAtual--;
-      if (indiceAtual < 0) indiceAtual = fila.length - 1;
+      if (!fila.length) return;
+      indiceAtual = (indiceAtual - 1 + fila.length) % fila.length;
       tocarMusica(indiceAtual);
     }
 
     function mudouEstado(event) {
-      if (event.data === YT.PlayerState.ENDED) proxima();
+      if (event.data === YT.PlayerState.PLAYING) {
+        document.getElementById("playPause").textContent = "⏸️ Tocando";
+        iniciarAtualizador();
+      } else {
+        document.getElementById("playPause").textContent = "▶️ Play";
+        if (atualizador) { clearInterval(atualizador); atualizador = null; }
+        if (event.data === YT.PlayerState.ENDED) aoTerminar();
+      }
     }
+
+    function aoTerminar() {
+      if (!fila.length) return;
+      if (modoRepetir === 2) {
+        player.seekTo(0, true);
+        player.playVideo();
+        return;
+      }
+      proxima(true);
+    }
+
+    function iniciarAtualizador() {
+      if (atualizador) clearInterval(atualizador);
+      atualizador = setInterval(atualizarProgresso, 500);
+    }
+
+    function atualizarProgresso() {
+      if (!player || typeof player.getDuration !== "function") return;
+      const duracao = player.getDuration() || 0;
+      const atual = player.getCurrentTime() || 0;
+      document.getElementById("currentTime").textContent = formatarTempo(atual);
+      document.getElementById("duration").textContent = formatarTempo(duracao);
+      document.getElementById("progress").value = duracao ? Math.round(atual / duracao * 1000) : 0;
+    }
+
+    function formatarTempo(segundos) {
+      if (!Number.isFinite(segundos) || segundos < 0) segundos = 0;
+      const total = Math.floor(segundos);
+      const minutos = Math.floor(total / 60);
+      const resto = total % 60;
+      return minutos + ":" + String(resto).padStart(2, "0");
+    }
+
+    function alternarEmbaralhar() {
+      embaralhar = !embaralhar;
+      prepararEmbaralhamento();
+      const botao = document.getElementById("shuffleButton");
+      botao.classList.toggle("active", embaralhar);
+      botao.setAttribute("aria-pressed", String(embaralhar));
+      botao.title = embaralhar ? "Embaralhar ligado" : "Embaralhar desligado";
+      document.getElementById("statusPlayer").innerText = embaralhar
+        ? "🔀 Embaralhar ligado. A próxima música será escolhida ao acaso."
+        : "Embaralhar desligado. A sequência seguirá a ordem da lista.";
+    }
+
+    function alternarRepetir() {
+      modoRepetir = (modoRepetir + 1) % 3;
+      const botao = document.getElementById("repeatButton");
+      const nomes = ["desligado", "sequência", "música"];
+      botao.textContent = "🔁 Repetir: " + nomes[modoRepetir];
+      botao.classList.toggle("active", modoRepetir !== 0);
+      botao.setAttribute("aria-pressed", String(modoRepetir !== 0));
+      botao.title = "Repetição: " + nomes[modoRepetir];
+      document.getElementById("statusPlayer").innerText = "🔁 Repetir " + nomes[modoRepetir] + ".";
+    }
+
+    document.getElementById("progress").addEventListener("input", function() {
+      if (!player || !player.getDuration) return;
+      const duracao = player.getDuration();
+      document.getElementById("currentTime").textContent = formatarTempo(duracao * Number(this.value) / 1000);
+    });
+    document.getElementById("progress").addEventListener("change", function() {
+      if (!player || !player.getDuration) return;
+      player.seekTo(player.getDuration() * Number(this.value) / 1000, true);
+    });
+    document.getElementById("volume").addEventListener("input", function() {
+      const valor = Number(this.value);
+      document.getElementById("volumeValue").textContent = valor + "%";
+      if (player && player.setVolume) player.setVolume(valor);
+    });
 
     function extrairVideoId(valor) {
       if (!valor) return null;
       const texto = valor.trim();
-      // Aceita o ID puro (11 caracteres) ou uma URL comum do YouTube.
       if (/^[\w-]{11}$/.test(texto)) return texto;
       const resultado = texto.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i);
       return resultado ? resultado[1] : null;
