@@ -77,11 +77,14 @@
     .btn-principal:hover { background: #1688df; border-color: #1688df; }
     .btn-play { background: #303b43; border-color: #466171; color: var(--blue); }
     .btn-play:hover { background: #394c58; }
-    .musica { margin: 9px 0; padding: 13px; border: 1px solid var(--line); border-radius: 10px; background: #252525; cursor: pointer; transition: border-color .15s, background .15s; }
-    .musica:hover, .musica:focus-visible { border-color: var(--blue); background: #2b3439; outline: none; }
+    .musica { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 9px 0; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: #252525; transition: border-color .15s, background .15s; }
     .musica.tocando { border-color: var(--blue); background: #18313e; }
-    .musica strong { display: block; overflow-wrap: anywhere; }
-    .musica .observacao { margin-top: 5px; text-align: left; }
+    .track-main { flex: 1; min-width: 0; margin: 0; padding: 8px; border: 0; background: transparent; text-align: left; white-space: normal; overflow-wrap: anywhere; }
+    .track-main:hover { background: #343c40; border-color: transparent; }
+    .track-main strong { display: block; }
+    .track-hint { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; font-weight: 400; }
+    .order-controls { display: flex; flex-direction: column; gap: 4px; }
+    .order-controls button { min-width: 42px; min-height: 36px; margin: 0; padding: 4px 8px; }
     .section-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
     .section-actions button { min-width: 190px; }
     .collapsed { display: none; }
@@ -124,9 +127,10 @@
         <summary>❔ Como usar, passo a passo</summary>
         <ol>
           <li>Toque em <strong>Adicionar músicas</strong>.</li>
-          <li>Cole uma música por linha neste formato: <code>Música | ID_DO_VIDEO</code>.</li>
-          <li>Toque em <strong>Interpretar lista</strong> para carregar as faixas.</li>
-          <li>Abra <strong>Minha sequência</strong> e toque numa música para começar por ela.</li>
+          <li>No YouTube, abra o vídeo da música e copie o link em <strong>Compartilhar</strong> ou na barra de endereço.</li>
+          <li>O ID aparece depois de <code>v=</code> no link. Exemplo: <code>youtube.com/watch?v=rfrpOhC6858</code> — o ID é <code>rfrpOhC6858</code>.</li>
+          <li>Cole uma música por linha. Você pode usar só o ID ou o link inteiro depois do separador <code>|</code>. Exemplo: <code>Jorge Ben Jor - Taj Mahal | https://www.youtube.com/watch?v=rfrpOhC6858</code>.</li>
+          <li>Toque em <strong>Interpretar lista</strong> para carregar as faixas. Depois, abra <strong>Minha sequência</strong> e toque numa música.</li>
         </ol>
       </details>
     </div>
@@ -172,7 +176,7 @@
 
     <div id="importPanel" class="card collapsed">
       <h2>🎵 Importar lista de músicas</h2>
-      <textarea id="lista" placeholder="Uma música por linha. Use o formato:&#10;Música | ID_DO_VIDEO&#10;&#10;Exemplo:&#10;Jorge Ben Jor - Taj Mahal | rfrpOhC6858&#10;Zeca Pagodinho - Deixa a Vida Me Levar | oTREAvZbmME"></textarea>
+      <textarea id="lista" placeholder="Uma música por linha. Use: Música | ID_DO_VIDEO ou LINK_DO_YOUTUBE&#10;&#10;Exemplo:&#10;Jorge Ben Jor - Taj Mahal | https://www.youtube.com/watch?v=rfrpOhC6858&#10;Zeca Pagodinho - Deixa a Vida Me Levar | oTREAvZbmME"></textarea>
       <button class="btn-principal" onclick="interpretarLista()">🎵 Interpretar lista</button>
       <button onclick="organizarLista()">📋 Organizar lista</button>
     </div>
@@ -281,6 +285,17 @@
       atualizarContagem();
     }
 
+    function moverFaixa(index, direcao) {
+      const destino = index + direcao;
+      if (destino < 0 || destino >= fila.length) return;
+      const musicaAtual = fila[indiceAtual];
+      [fila[index], fila[destino]] = [fila[destino], fila[index]];
+      indiceAtual = fila.indexOf(musicaAtual);
+      prepararEmbaralhamento();
+      mostrarLista();
+      document.getElementById("statusPlayer").innerText = "📋 Ordem atualizada. O player seguirá a sequência que você escolheu.";
+    }
+
     function mostrarLista() {
       const area = document.getElementById("sequencia");
       area.replaceChildren();
@@ -288,28 +303,45 @@
       fila.forEach(function(musica, index) {
         const div = document.createElement("div");
         div.className = "musica";
-        div.tabIndex = 0;
-        div.setAttribute("role", "button");
-        div.setAttribute("aria-label", "Tocar " + musica.nome);
         if (index === indiceAtual) div.classList.add("tocando");
+        const botaoFaixa = document.createElement("button");
+        botaoFaixa.className = "track-main";
+        botaoFaixa.setAttribute("aria-label", "Tocar " + musica.nome);
         const titulo = document.createElement("strong");
         titulo.textContent = (index + 1) + ". " + musica.nome;
-        div.appendChild(titulo);
-        div.onclick = function() { tocarMusica(index); };
-        div.onkeydown = function(event) {
-          if (event.key === "Enter" || event.key === " ") { event.preventDefault(); tocarMusica(index); }
-        };
+        botaoFaixa.appendChild(titulo);
+        botaoFaixa.onclick = function() { tocarMusica(index); };
         if (musica.videoId) {
           const dica = document.createElement("div");
-          dica.className = "observacao";
-          dica.textContent = "▶️ Toque aqui para tocar";
-          div.appendChild(dica);
+          dica.className = "track-hint";
+          dica.textContent = "▶️ Toque para tocar";
+          botaoFaixa.appendChild(dica);
         } else {
           const aviso = document.createElement("div");
-          aviso.className = "observacao";
+          aviso.className = "track-hint";
           aviso.textContent = "⚠️ Vídeo do YouTube não associado. Adicione o ID no formato: Música | ID";
-          div.appendChild(aviso);
+          botaoFaixa.appendChild(aviso);
         }
+        div.appendChild(botaoFaixa);
+        const controles = document.createElement("div");
+        controles.className = "order-controls";
+        const subir = document.createElement("button");
+        subir.type = "button";
+        subir.textContent = "↑";
+        subir.title = "Mover para cima";
+        subir.setAttribute("aria-label", "Mover " + musica.nome + " para cima");
+        subir.disabled = index === 0;
+        subir.onclick = function() { moverFaixa(index, -1); };
+        const descer = document.createElement("button");
+        descer.type = "button";
+        descer.textContent = "↓";
+        descer.title = "Mover para baixo";
+        descer.setAttribute("aria-label", "Mover " + musica.nome + " para baixo");
+        descer.disabled = index === fila.length - 1;
+        descer.onclick = function() { moverFaixa(index, 1); };
+        controles.appendChild(subir);
+        controles.appendChild(descer);
+        div.appendChild(controles);
         area.appendChild(div);
       });
     }
